@@ -154,14 +154,15 @@ describe('PUT /users/:id', () => {
         it('없는 유저일 경우', done=>{
             request(app)
                 .put('/users/999')
+                .send({name:'foo'})
                 .expect(404)
                 .end(done);
         })
         it('이름이 줌복일 경우', done=>{
             request(app)
                 .put('/users/3')
-                .send({name:'민하'})
-                .expect(400)
+                .send({name:'심민하'})
+                .expect(409)
                 .end(done);
         })
     })
