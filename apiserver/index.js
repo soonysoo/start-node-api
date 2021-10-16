@@ -61,9 +61,18 @@ app.put('/users/:id', (req, res) =>{
   const id  = parseInt(req.params.id , 10);
   //id가 정수인지 아닌지
   if(Number.isNaN(id)) return res.status(400).end();
+  
+  
   const name = req.body.name;
+  // 실패 테스트 - 이름이 없는 경우 
+  if(!name) return res.status(400).end();
+
+  //user 중복이 되는지 확인
+  const isConfilct = users.filter(user => user.name === name).length;
+  if(isConfilct) return res.status(409).end();
 
   const user = users.filter(user => user.id === id)[0];
+  if(!user) return res.status(404).end();
   user.name = name;
   
   res.json(user);
