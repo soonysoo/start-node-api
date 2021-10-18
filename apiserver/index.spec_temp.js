@@ -1,4 +1,4 @@
-const app = require('./index');
+const app = require('./index_temp');
 const should =  require('should');
 const request = require('supertest');
 
@@ -73,6 +73,7 @@ describe('Delete /users/1', ()=>{
         })
     })
 })
+
 describe('실패시', () =>{
     it('id가 숫자가 아닐경우 400으로 응답한다',done =>{
         request(app)
