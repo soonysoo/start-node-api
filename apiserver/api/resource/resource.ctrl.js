@@ -3,6 +3,7 @@ var fs = require('fs');
 
 let kernelData = new Array();
 let jsonData = new Object();
+let VDNData = new Object();
 
 const showKernel  = function(req, res){
   let jsonKernelData= [];
@@ -31,37 +32,55 @@ const updataKernel = function(req, res){
     jsonData[key] = value
     jsonData['update_config'] = "1";
 
-    //console.log(JSON.stringify(jsonData));
     fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_kernel.json'
       , JSON.stringify(jsonData),'utf8',function(error){
         console.log(error); 
       })
-      const updateStr = `[UPDATE]
-      update_config	=1
-      update_vdn	=0`
-    fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_update.ini', updateStr,'utf8',function(e){
-      console.log(e);
-    })  
 
+    updateIni("CONFIG");
     res.status(200).end();
   }
 
 const showVDN = function(req, res){
   fs.readFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_vdn_list.json','utf8', 
     function(err, result){
-      jsonData = JSON.parse(result);
-      console.log(jsonData);
-      res.json(jsonData.vdn_list); 
+      VDNData = JSON.parse(result);
+      //console.log(VDNData);
+      res.json(VDNData.vdn_list); 
     })
   }
+
+//VDN 정보 추가 
+const addVDN =  function(req, res){
+  const newVDN = req.body;
+  if(newVDN.vdn_no===''){
+    console.log("vdn 추가 정보가 없습니다.")
+    return res.status(400).send("vdn_no 이 없습니다.").end();
+  }
+
+  //VDN 중복확인하기 
+  const isConfilct = VDNData.vdn_list.filter(list => list.vdn_no === newVDN.vdn_no).length;
+  if(isConfilct) return res.status(409).send("이미 존재하는 VDN입니다").end();
+
+  VDNData.vdn_list.push(newVDN);
+
+  fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_vdn_list.json'
+  , JSON.stringify(VDNData),'utf8',function(error){
+    console.log(error); 
+  })
+  updateIni("VDN");
+
+  res.json(VDNData.vdn_list);
+}
+
 // VDN 삭제 API
-// const deleteVDN = function(req, res){
-//   if(!jsonData.length) return res.status(406).end()
+const deleteVDN = function(req, res){
+  console.log(req);
+  if(!VDNData.length) return res.status(406).end()
   
-  
+}
 
 
-// }
 
 const showIVR = function(req, res){
   fs.readFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_ivr_list.json','utf8', 
@@ -95,10 +114,31 @@ const addIVR = function(req, res){
   res.status(200).end();
 }
 
+const updateIni = (param) =>{
+  let str = "";
+  if(param === "CONFIG"){
+    str = `[UPDATE]
+    update_config	=1
+    update_vdn	=0`
+  }
+
+  if(param === "VDN"){
+    str = `[UPDATE]
+    update_config	=0
+    update_vdn	=1`
+  }
+
+  fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_update.ini', str,'utf8',function(e){
+    console.log(e);
+  }) 
+}
+
 module.exports = {
   showKernel : showKernel,
   updataKernel : updataKernel,
   showVDN : showVDN,
+  addVDN : addVDN,
+  deleteVDN : deleteVDN,
   showIVR : showIVR,
   addIVR : addIVR
 }
