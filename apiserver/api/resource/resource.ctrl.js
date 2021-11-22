@@ -55,7 +55,7 @@ const addVDN =  function(req, res){
   const newVDN = req.body;
   if(newVDN.vdn_no===''){
     console.log("vdn 추가 정보가 없습니다.")
-    return res.status(400).send("vdn_no 이 없습니다.").end();
+    return res.status(400).send("VDN 정보를 입력하세요.").end();
   }
 
   //VDN 중복확인하기 
@@ -75,9 +75,27 @@ const addVDN =  function(req, res){
 
 // VDN 삭제 API
 const deleteVDN = function(req, res){
-  console.log(req);
-  if(!VDNData.length) return res.status(406).end()
+  const vdnID = req.params.id;
+  //vdn값이 없는 경우
+  if(vdnID==='') return res.status(400).send("vdn값이 비었습니다").end();
+
+  console.log(VDNData.vdn_list);
+  //없는 VDN인 경우
+  const isEmpty = VDNData.vdn_list.filter(list => list.vdn_no === vdnID).length;
+  if(!isEmpty) return res.status(409).send("존재하지 않는 VDN입니다. ").end();
+
+  const vdnList =  VDNData.vdn_list.filter(list => list.vdn_no !== vdnID);
   
+  VDNData.vdn_list = vdnList;
+
+  fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_vdn_list.json'
+  , JSON.stringify(VDNData),'utf8',function(error){
+    console.log(error); 
+  })
+
+  updateIni("VDN");
+
+  res.json(vdnList).status(204).end();
 }
 
 
