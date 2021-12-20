@@ -33,7 +33,7 @@ const updataKernel = function(req, res){
     jsonData['update_config'] = "1";
 
     fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_kernel.json'
-      , JSON.stringify(jsonData),'utf8',function(error){
+      , JSON.stringify(jsonData,null,4),'utf8',function(error){
         console.log(error); 
       })
 
@@ -61,11 +61,10 @@ const addVDN =  function(req, res){
   //VDN 중복확인하기 
   const isConfilct = VDNData.vdn_list.filter(list => list.vdn_no === newVDN.vdn_no).length;
   if(isConfilct) return res.status(409).send("이미 존재하는 VDN입니다").end();
-
   VDNData.vdn_list.push(newVDN);
 
   fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_vdn_list.json'
-  , JSON.stringify(VDNData),'utf8',function(error){
+  , JSON.stringify(VDNData,null,4),'utf8',function(error){
     console.log(error); 
   })
   updateIni("VDN");
@@ -89,7 +88,7 @@ const deleteVDN = function(req, res){
   VDNData.vdn_list = vdnList;
 
   fs.writeFile('D:\\CTI_SHLIFE_TM\\Cfg\\cfg_vdn_list.json'
-  , JSON.stringify(VDNData),'utf8',function(error){
+  , JSON.stringify(VDNData,null,4),'utf8',function(error){
     console.log(error); 
   })
 
@@ -124,12 +123,19 @@ const showIVR = function(req, res){
       res.json(responseJSON); 
     })
 }
-
+// IVR 채널 등록
 const addIVR = function(req, res){
   console.log(req);
-  console.log(req.params);
-  //const 
+  console.log(req.body.params);
+  const newVDN = req.body.params.newVDN;
+  if(newVDN)
+  
   res.status(200).end();
+}
+
+//IVR 채널 삭제
+const deleteIVR = function(req, res){
+
 }
 
 const updateIni = (param) =>{
