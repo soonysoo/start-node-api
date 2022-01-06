@@ -14,17 +14,19 @@ if(process.env.NODE_ENV !=='test'){
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
-app.use(cors(corsOptions));
+app.use(cors());
 
 var corsOptions = {
-  origin : "localhost:3000",
+  origin : "*",
   credentials : true,
 }
 
 
 //users로 들어오는 모든 api에 대해서는 user 모듈에서 담당한다.
 app.use('/users', user)
+//resource 로 들어오는 API는 모두 resource 모듈에서 담당한다
 app.use('/resource', resource)
+//util에서 들어오는 API는 모두 util에서 담당한다.
 app.use('/util', util)
 
 module.exports = app;  //객체를 할당  
